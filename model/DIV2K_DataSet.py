@@ -73,8 +73,8 @@ class DIV2K_DataSet(data.Dataset):
                 self.data = torch.cat((self.data,img_lr_crop),dim=0)
         
     def __getitem__(self, index):
-        input = self.data[index]
-        target= self.label[index]
+        input = self.data[index:index+1]
+        target= self.label[index:index+1]
         
         return input, target
 
