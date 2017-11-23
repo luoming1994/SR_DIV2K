@@ -52,7 +52,7 @@ class GenerateNet(nn.Module):
         
         self.conv2 = conv3x3(channels,channels//2)
         self.relu2 = nn.ReLU(inplace=True)
-        self.conv3 = conv3x3(channels//2,1)
+        self.conv3 = conv1x1(channels//2,1)
     
     def forward(self,x):
         out = self.conv1(x)

@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*- #
+
 import os
 import torch
 from PIL import Image
 import torch.utils.data as data
 import torchvision.transforms as transforms
-
 
 def load_img(filepath,upscale=None):
     """
@@ -40,7 +41,7 @@ def cut_img(img,crop_size = 64):
 class DIV2K_DataSet(data.Dataset):
     """
     super resolution image dataset
-	load all the big image into memory at once，and cut into normal size
+    load all the big image into memory at once£¬and cut into normal size
     data_dir:  images file dir
     scale_list:super resolution upcale num list 
     """
@@ -81,4 +82,31 @@ class DIV2K_DataSet(data.Dataset):
 
     def __len__(self):
         return self.data.size()[0]
+
+
+
+class DIV2K_patchDataSet(data.Dataset):
+    """
+    images have been cut into normal size(such as 64x64),
+    we just read the samll image when we need it; 
+    """
+    def __init__(self,imgDir,scale_list = [2],img_num = 1024):
+        super(DIV2K_patchDataSet,self).__init__()
+        self.imgDir = imgDir
+        self.scale_list= scale_list
+        self.img_num = img_num
+        self.transform = transforms.ToTensor()
+    
+    def __getitem__(self, index):
+        scale_index = index//self.img_num
+        upscale = self.scale_list[scale_index]
+        img_index = index - scale_index*self.img_num
+        path_hr = os.path.join(self.imgDir,'DIV2K_patch_train_HR','%08d.png'%img_index)
+        path_lr = os.path.join(self.imgDir,'DIV2K_patch_train_LR','X%d'%upscale,'%08d.png'%img_index)
+        img_hr = self.transform(load_img(path_hr))
+        img_lr = self.transform(load_img(path_lr))
+        return img_lr,img_hr
         
+    def __len__(self):
+        return len(self.scale_list)*self.img_num
+

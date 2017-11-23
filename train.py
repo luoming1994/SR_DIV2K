@@ -8,8 +8,9 @@ import torch.backends.cudnn as cudnn
 import torch.optim as optim
 from torch.autograd import Variable
 
-from DIV2K_DataSet import DIV2K_DataSet
-from model import GenerateNet
+from model.model import GenerateNet
+from model.DIV2K import DIV2K_DataSet
+
 
 import matplotlib.pyplot as plt
 
@@ -34,7 +35,7 @@ def calAcc(pred,label):
     # calculate acc
     pred_np = pred.cpu().data.numpy().argmax(axis=1)
     labels_np = label.cpu().data.numpy()
-    acc = np.mean(pre ==labels_np)
+    acc = np.mean(pred_np ==labels_np)
         
 
 opt = arg(cuda=False)
