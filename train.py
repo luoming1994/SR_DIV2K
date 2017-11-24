@@ -36,7 +36,10 @@ def calAcc(pred,label):
     pred_np = pred.cpu().data.numpy().argmax(axis=1)
     labels_np = label.cpu().data.numpy()
     acc = np.mean(pred_np ==labels_np)
-        
+
+def adjust_learning_rate(optimizer, decay_rate=.9):
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = param_group['lr'] * decay_rate	
 
 opt = arg(cuda=False)
 dataset = DIV2K_DataSet(data_dir = opt.imagesDir,

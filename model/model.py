@@ -11,6 +11,11 @@ def conv3x3(in_channels,out_channels,stride=1):
 def conv5x5(in_channels,out_channels,stride=1):
     return nn.Conv2d(in_channels,out_channels,kernel_size=5,stride=stride,padding=2)
 
+def conv7x7(in_channels,out_channels,stride=1):
+    return nn.Conv2d(in_channels,out_channels,kernel_size=7,stride=stride,padding=3)
+
+def conv9x9(in_channels,out_channels,stride=1):
+    return nn.Conv2d(in_channels,out_channels,kernel_size=9,stride=stride,padding=4)	
         
 class ResBlock_EDSR(nn.Module):
     '''
@@ -36,6 +41,33 @@ class ResBlock_EDSR(nn.Module):
         #out = self.relu(out)
         return out  
 
+class multiResBlock(nn.Module):
+    '''
+    multi scale Residual Block:
+    in ->
+    conv(channels,channels,stride) -> ReLU
+    conv(out_channels,out_channels,1)
+    -> out
+    (downsample)in + out
+    '''
+    def __init__(self, in_channels,out_channels, stride=1):
+        super(multiResBlock,self).__init__()
+        self.conv3 = conv3x3(in_channels,out_channels,stride)
+		self.conv5 = conv5x5(in_channels,out_channels,stride)
+		self.conv7 = conv7x7(in_channels,out_channels,stride)
+        self.relu = nn.ReLU(inplace=True)
+        self.conv2 = conv3x3(in_channels,channels)
+
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.relu(out)
+        out = self.conv2(out)
+
+        out = out + x
+        #out = self.relu(out)
+        return out
+		
+		
 class GenerateNet(nn.Module):
     """
     Generate network,input lr image ,output hr image

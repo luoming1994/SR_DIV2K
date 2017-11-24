@@ -58,7 +58,7 @@ t0 = time.time()
 with open(os.path.join(opt.logOutDir,'trainPatch.log'),'a') as f:
     loss_list= []
     for epoch in range(opt.niter):#epoch
-        for indx,(images,labels) in enumerate(train_loader):#batch
+        for index,(images,labels) in enumerate(train_loader):#batch
             netG.zero_grad()
             if(opt.cuda):
                 images = images.cuda()
@@ -77,7 +77,9 @@ with open(os.path.join(opt.logOutDir,'trainPatch.log'),'a') as f:
             loss_list.append(err.data[0])
             #print mean loss in 100 batch
             if len(loss_list) == 1:
-                print('[train][epoch:%d/%d][batch:%d]Loss: %.4f'%(epoch, opt.niter,indx,sum(loss_list)/len(loss_list)))
+                print('[train][epoch:%d/%d][batch:%d]Loss: %.4f'%(epoch, opt.niter,index,sum(loss_list)/len(loss_list)))
                 loss_list[:] = []
+			if index%100 == 0:
+				torch.save(netG.state_dict(), '%s/netG%d_%d.pth' % (opt.netSaveDir,epoch,index))
 print("train caost:%.4f"%(time.time()-t0))
 torch.save(netG.state_dict(), '%s/netG.pth' % (opt.netSaveDir))    

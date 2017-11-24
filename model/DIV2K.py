@@ -28,7 +28,7 @@ def cut_img(img,crop_size = 64):
         img_size = img.size()
         assert len(img_size)==3 
         if img_size[-1]>=crop_size and img_size[-2]>=crop_size:
-            H,W = img_size[-2]//crop_size,img_size[-2]//crop_size
+            H,W = img_size[-2]//crop_size,img_size[-1]//crop_size
             chnnl = img_size[0]   # img channel
             img_cut  = torch.Tensor(H*W*chnnl,crop_size,crop_size)
             for h in range(0,H,1):
