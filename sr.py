@@ -47,7 +47,7 @@ def PSNR(im,gt):
         return -1
     mse = np.mean((gt - im)**2)
     psnr = 10*np.log10(255**2/mse)
-    return psnr,mse
+    return psnr
 
 def SSIM(im,gt):
     im_shape = im.shape
@@ -77,32 +77,32 @@ def SSIM(im,gt):
     ssim = l_xy*c_xy*s_xy
     
     return ssim
-	
-	
+    
+    
 # argparse
 class arg(object):
     def __init__(self,
-                net_path 		= r'net/netG.pth',
-				image_path_lr	= '',
-				image_path_hr	= '',
-				upscale			= 2,
-				saveImage		= True,
-				save_path		= r'save.png',
-                cuda 			= True):
+                net_path        = r'net/GenerateNet.pth',
+                image_path_lr   = '',
+                image_path_hr   = '',
+                upscale         = 2,
+                saveImage       = True,
+                save_path       = r'E:\Data\DIV2K\5SR.bmp',
+                cuda            = True):
         
-        self.net_path		= net_path    
+        self.net_path       = net_path    
         self.image_path_lr = image_path_lr
         self.image_path_hr = image_path_hr
-        self.upscale		= upscale
-        self.saveImage		= saveImage
-        self.save_path		= save_path
-        self.cuda       	= True
+        self.upscale        = upscale
+        self.saveImage      = saveImage
+        self.save_path      = save_path
+        self.cuda           = True
 
 #set argparse        
 opt = arg(cuda = False,
-		image_path_lr = r'E:\Data\DIV2K\3x2.png',
-		image_path_hr = r'E:\Data\DIV2K\3HR.png'
-		)
+        image_path_lr = r'E:\Data\DIV2K\5LR.bmp',
+        image_path_hr = r'E:\Data\DIV2K\5HR.bmp'
+        )
 #load the network
 netG = GenerateNet()
 netG.load_state_dict(torch.load(opt.net_path))
@@ -119,11 +119,16 @@ img_in = Variable(img_in)
 # forward the net ,get output
 Y_out = netG(img_in)
 # convert output data type
-Y_out_np = np.array(Y_out.data[0,0].numpy()*255,dtype = np.uint8) # 4 dim Tensor => 2dim numpy.array
-Y_sr  = Image.fromarray(Y_out_np)   # 2dim array =>  L mode Image
+Y_out_np = np.array(Y_out.data[0,0].numpy()*255,dtype = np.float32) # 4 dim Tensor => 2dim numpy.array
+Y_out_np[Y_out_np<0]=0          # [0,255]
+Y_out_np[Y_out_np>255]=255
+Y_sr  = Image.fromarray(np.array(Y_out_np,dtype = np.uint8))   # 2dim array =>  L mode Image
 img_sr = mergeYCbCrImg2RGB(Y_sr,Cb_lr,Cr_lr)
 img_sr.save(opt.save_path)
 #vutils.save_image(Y_sr.data,opt.save_path,normalize=True)
-
+lr_psnr = PSNR(np.array(Y_hr,dtype = np.float32),np.array(Y_lr,dtype = np.float32))
+sr_psnr = PSNR(np.array(Y_hr,dtype = np.float32),Y_out_np)
+PSNR(np.array(Y_hr,dtype = np.float32),np.array(Y_out.data[0,0].numpy()*255,dtype = np.float32))
+print(lr_psnr,sr_psnr)
 
 
