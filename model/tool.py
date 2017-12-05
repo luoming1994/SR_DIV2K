@@ -99,11 +99,9 @@ def validModel(net,img_lr,img_hr,save_dir = None):
     """
     # get the lr and hr images paths list
     if  not os.path.exists(img_lr):
-        print(img_lr,'is not exist')
-        return -1,[]
+        raise Exception("%s is not exist !"%img_lr)
     if  not os.path.exists(img_hr):
-        print(img_hr,'is not exist')
-        return -1,[]
+        raise Exception("%s is not exist !"%img_hr)
     img_lr_paths = []
     img_hr_paths = []
     if os.path.isfile(img_lr) and os.path.isfile(img_hr):
@@ -145,6 +143,7 @@ def validModel(net,img_lr,img_hr,save_dir = None):
         sr_psnr = PSNR(Y_hr_np,net_out_np)
         lr_loss_list.append(lr_psnr)
         sr_loss_list.append(sr_psnr)
+    # get mean loss of all the valid data
     lr_psnr_mean = np.mean(lr_loss_list)
     lr_loss_list.append(lr_psnr_mean)
     lr_psnr_mean = np.mean(sr_loss_list)
